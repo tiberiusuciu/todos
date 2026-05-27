@@ -1,0 +1,133 @@
+# Todos
+
+Minimal nested todo app — dark theme, multi-user with email/password auth.
+
+## Run
+
+```bash
+docker compose up --build
+```
+
+Open [http://localhost:5173](http://localhost:5173)
+
+On first run, the `ollama-init` service pulls the `llama3.2:1b` model (~1.3 GB). This may take a few minutes.
+
+Sign up with email and password (min 8 characters). Each user sees only their own tasks.
+
+## Auth
+
+- **Sign up / sign in** — minimal screen on first visit
+- **Sign out** — top-right on the todo screen
+- Sessions use an httpOnly cookie (JWT, 7-day default)
+- **Production sign-up** requires a shared invite code (`REGISTRATION_CODE` in `.env`)
+- Copy `.env.example` to `.env` and set secrets before production
+
+### Generate an invite code
+
+The code is a plain secret string friends enter at sign-up. A 64-character hex string works well (same shape as a SHA-256 hash):
+
+```bash
+openssl rand -hex 32
+```
+
+Put the output in `.env` as `REGISTRATION_CODE=...` and share it privately with friends and family.
+
+## Emoji AI
+
+Each new todo gets an emoji suggested by **Ollama** running locally in Docker — no API keys or paid services.
+
+- Suggestion is based on the **title only**
+- Click the emoji to open a searchable picker and choose a different one
+- Falls back to 📋 if Ollama isn't ready yet
+
+Optional: copy `.env.example` to `.env` to change `OLLAMA_MODEL`.
+
+## Dev (without Docker)
+
+Terminal 1 — MongoDB (or use Docker for mongo only):
+
+```bash
+docker compose up mongo
+```
+
+Terminal 2 — API:
+
+```bash
+cd server && npm install && npm run dev
+```
+
+Terminal 3 — Client:
+
+```bash
+cd client && npm install && npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) (Vite dev server proxies `/api` to port 3001).
+
+Local dev does not require an invite code unless you set `REGISTRATION_CODE` in your environment.
+
+## Tests
+
+```bash
+cd server && npm test
+cd client && npm run build
+```
+
+## CI/CD
+
+Pushing to `main` or opening a PR runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+1. Server — `npm test` + `npm run build`
+2. Client — `npm run build`
+3. Docker — `docker compose -f docker-compose.prod.yml build`
+
+Deploy is **not automatic until configured**. [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) SSHs to your VPS after CI passes on `main`. Required GitHub secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `DEPLOY_HOST` | VPS hostname or IP |
+| `DEPLOY_USER` | SSH user |
+| `DEPLOY_SSH_KEY` | Private SSH key |
+| `DEPLOY_PATH` | Optional app directory on VPS (default `~/todo-app`) |
+
+## Production deploy (single VPS)
+
+Everything runs on one server: **Caddy + client + API + MongoDB + Ollama**.
+
+Recommended: **≥8 GB RAM** (e.g. Hetzner CX32) — Ollama, Mongo, and Node together need headroom.
+
+1. Push repo to GitHub
+2. Buy a domain; point a subdomain A record at your VPS IP
+3. Hetzner VPS: install Docker Compose; firewall **22, 80, 443** only
+4. Clone repo; create `.env`:
+
+```env
+DOMAIN=todos.yourdomain.com
+JWT_SECRET=<openssl rand -hex 32>
+REGISTRATION_CODE=<openssl rand -hex 32>
+JWT_EXPIRES_IN=7d
+OLLAMA_MODEL=llama3.2:1b
+```
+
+5. Deploy:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env up --build -d
+```
+
+6. Wait for `ollama-init` to pull the model on first run
+7. Share the subdomain + invite code only with trusted people
+
+MongoDB data persists in the `mongo_data` Docker volume. Back it up periodically with `mongodump` if you care about recovery.
+
+Auth endpoints are rate-limited (login: 10 / 15 min per IP; register: 5 / hour per IP).
+
+## Features
+
+- Unlimited nested sub-tasks
+- Notes under each title
+- Collapsible branches (state saved in browser)
+- Mark tasks done
+- AI-suggested emoji per task (Ollama)
+- Per-user data isolation
+- Mobile-friendly dark UI

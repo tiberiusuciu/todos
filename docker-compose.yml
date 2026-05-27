@@ -1,0 +1,53 @@
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  ollama-init:
+    image: curlimages/curl:latest
+    depends_on:
+      ollama:
+        condition: service_started
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until curl -sf http://ollama:11434/ > /dev/null; do sleep 2; done
+        curl -sf http://ollama:11434/api/pull -d '{"name":"llama3.2:1b"}'
+    restart: "no"
+
+  api:
+    build: ./server
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/todos
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      PORT: 3001
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
+    depends_on:
+      - mongo
+      - ollama
+    ports:
+      - "3001:3001"
+
+  client:
+    build: ./client
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:
+  ollama_data:
