@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/tiberiusuciu/todos/compare/v1.1.0...v1.2.0) (2026-05-28)
+
+
+### Features
+
+* **tasks:** Add subtask count ([3ec1ac5](https://github.com/tiberiusuciu/todos/commit/3ec1ac5624170c2a4c4afc1334cb2baf9c348423))
+
 # [1.1.0](https://github.com/tiberiusuciu/todos/compare/v1.0.0...v1.1.0) (2026-05-28)
 
 
