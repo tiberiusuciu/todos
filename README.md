@@ -73,15 +73,48 @@ cd server && npm test
 cd client && npm run build
 ```
 
+## Versioning
+
+The app version is shown vertically on the right edge of the UI (e.g. `v1.1.0`). It comes from the root [`package.json`](package.json).
+
+On every push to **`main`**, [semantic-release](https://github.com/semantic-release/semantic-release) analyzes commits and bumps the version:
+
+| Commit | Bump |
+|--------|------|
+| `fix:` | patch |
+| `feat:` | minor |
+| `feat!:` or `BREAKING CHANGE:` | major |
+| `chore:`, `docs:`, etc. | no release |
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) on PR titles or squash-merge messages, e.g.:
+
+```
+feat: add cyberpunk version stamp
+fix: correct todo reorder on mobile
+```
+
+**Baseline:** before the first automated release, tag the current state:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 ## CI/CD
 
-Pushing to `main` or opening a PR runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+**Pull requests** run [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (test + build).
 
-1. Server — `npm test` + `npm run build`
-2. Client — `npm run build`
-3. Docker — `docker compose -f docker-compose.prod.yml build`
+**Push to `main`** runs [`.github/workflows/main.yml`](.github/workflows/main.yml):
 
-Deploy is **not automatic until configured**. [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) SSHs to your VPS after CI passes on `main`. Required GitHub secrets:
+1. Server — test + build
+2. Client — build
+3. Docker — prod compose build
+4. Release — semantic-release (version bump + GitHub tag; `[skip ci]` on release commit)
+5. Deploy — SSH to VPS, `git pull`, `docker compose up --build -d`
+
+Manual deploy only: **Actions → Deploy → Run workflow** ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
+
+Required GitHub secrets:
 
 | Secret | Description |
 |--------|-------------|

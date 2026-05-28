@@ -54,6 +54,15 @@ body {
     @apply flex shrink-0 items-center gap-0.5 opacity-100;
   }
 
+  .version-stamp {
+    @apply pointer-events-none fixed right-3 top-1/2 z-50 -translate-y-1/2 select-none font-mono text-[10px] tracking-[0.25em] text-zinc-600;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    text-shadow:
+      0 0 6px rgba(34, 211, 238, 0.12),
+      0 0 14px rgba(232, 121, 249, 0.08);
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .todo-item-controls {
       @apply pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 opacity-0 transition-opacity;
