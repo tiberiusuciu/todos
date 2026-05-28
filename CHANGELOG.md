@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/tiberiusuciu/todos/compare/v1.3.0...v1.3.1) (2026-05-28)
+
+
+### Bug Fixes
+
+* **tasks:** Update appearance of long texts and fix animations ([960dbb3](https://github.com/tiberiusuciu/todos/commit/960dbb30ee4a687ded674ede57fae2560e7971f9))
+
 # [1.3.0](https://github.com/tiberiusuciu/todos/compare/v1.2.1...v1.3.0) (2026-05-28)
 
 
