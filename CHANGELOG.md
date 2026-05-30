@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/tiberiusuciu/todos/compare/v1.4.1...v1.5.0) (2026-05-30)
+
+
+### Features
+
+* **due-dates:** Add due date on tasks ([8280043](https://github.com/tiberiusuciu/todos/commit/82800432af8570bacb0ecfb2a3547230febc95ad))
+
 ## [1.4.1](https://github.com/tiberiusuciu/todos/compare/v1.4.0...v1.4.1) (2026-05-30)
 
 
