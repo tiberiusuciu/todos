@@ -18,7 +18,7 @@ export default function App() {
   const { message, showToast, dismissToast } = useToast();
   const [newTitle, setNewTitle] = useState("");
   const [scrollToTodoId, setScrollToTodoId] = useState<string | null>(null);
-  const { tree, loading, error, create, update, remove, moveSibling, moveTodo, syncRemote } =
+  const { tree, loading, error, create, update, remove, moveTodo, syncRemote } =
     useTodos(showToast, user?.id, setScrollToTodoId);
 
   useTodoSync({
@@ -165,7 +165,6 @@ export default function App() {
               onUpdate={handleUpdate}
               onCreate={handleCreateChild}
               onDelete={handleDelete}
-              onMoveSibling={moveSibling}
               isCollapsed={isCollapsed}
               toggleCollapsed={toggle}
             />

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, type CreateTodoInput, type ReorderItem, type Todo, type UpdateTodoInput } from "../lib/api";
 import { mergeTodos, todosChanged } from "../lib/mergeTodos";
-import { getReorderUpdates, getReorderUpdatesFromDrag } from "../lib/reorderUtils";
+import { getReorderUpdatesFromDrag } from "../lib/reorderUtils";
 import { applyMoveToFlat, computeMove, type DropPreview, type MoveResult } from "../lib/moveUtils";
 import { buildTree, type TodoNode } from "../lib/treeUtils";
 
@@ -201,12 +201,6 @@ export function useTodos(
     });
   };
 
-  const moveSibling = async (siblings: TodoNode[], id: string, direction: "up" | "down") => {
-    const items = getReorderUpdates(siblings, id, direction);
-    if (!items) return;
-    await reorder(items);
-  };
-
   const reorderByDrag = async (siblings: TodoNode[], dragId: string, targetId: string) => {
     const items = getReorderUpdatesFromDrag(siblings, dragId, targetId);
     if (!items) return;
@@ -248,7 +242,6 @@ export function useTodos(
     create,
     update,
     remove,
-    moveSibling,
     reorderByDrag,
     moveTodo,
     refresh,

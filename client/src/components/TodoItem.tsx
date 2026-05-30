@@ -16,13 +16,13 @@ import { useLongPress } from "../hooks/useLongPress";
 import { useExpandHeight } from "../hooks/useExpandHeight";
 import { TodoSiblingList } from "./TodoSiblingList";
 import { EmojiPickerPopover } from "./EmojiPickerPopover";
+import { TodoActionsMenu } from "./TodoActionsMenu";
 
 type Props = {
   node: TodoNode;
   listParentId: string | null;
   depth: number;
   siblings: TodoNode[];
-  siblingIndex: number;
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   scrollToTodoId: string | null;
   onScrolledToTodo: () => void;
@@ -31,12 +31,9 @@ type Props = {
   dropPreview: DropPreview | null;
   dragRowHeight: number;
   showInsertGhost: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
   onUpdate: (id: string, data: { title?: string; notes?: string; emoji?: string; completed?: boolean }) => Promise<void>;
   onCreate: (parentId: string, title: string) => Promise<boolean>;
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
-  onMoveSibling: (siblings: TodoNode[], id: string, direction: "up" | "down") => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
 };
@@ -59,7 +56,6 @@ export function TodoItem({
   listParentId,
   depth,
   siblings,
-  siblingIndex,
   scrollContainerRef,
   scrollToTodoId,
   onScrolledToTodo,
@@ -68,12 +64,9 @@ export function TodoItem({
   dropPreview,
   dragRowHeight,
   showInsertGhost,
-  onMoveUp,
-  onMoveDown,
   onUpdate,
   onCreate,
   onDelete,
-  onMoveSibling,
   isCollapsed,
   toggleCollapsed,
 }: Props) {
@@ -105,9 +98,6 @@ export function TodoItem({
   const collapsed = isCollapsed(node._id);
   const childrenOpen = childCount > 0 && !collapsed;
   const isPending = !!node.emojiPending;
-  const listHasPending = siblings.some((s) => s.emojiPending);
-  const canMoveUp = siblingIndex > 0 && !isPending && !listHasPending;
-  const canMoveDown = siblingIndex < siblings.length - 1 && !isPending && !listHasPending;
   const childProgress = childProgressMap.get(node._id);
   const isBeingDragged = isDragging || activeId === node._id;
   const isNestTarget = dropPreview?.kind === "nest" && dropPreview.targetId === node._id;
@@ -233,6 +223,16 @@ export function TodoItem({
     }
   };
 
+  const progressBadge = childProgress ? (
+    <span
+      className={`shrink-0 text-[10px] tabular-nums leading-none ${
+        childProgress.done === childProgress.total ? "text-zinc-400" : "text-zinc-500"
+      }`}
+    >
+      {childProgress.done}/{childProgress.total}
+    </span>
+  ) : null;
+
   return (
     <li
       ref={itemRef}
@@ -254,7 +254,7 @@ export function TodoItem({
           aria-hidden
         />
         <div
-          className={`todo-item group relative rounded-lg px-1 py-1 ${node.completed ? "opacity-60" : ""} ${addingChild || editingTitle || editingNotes ? "show-controls" : ""}`}
+          className={`todo-item group relative rounded-lg px-1 py-1 ${node.completed ? "opacity-60" : ""}`}
         >
           {isNestTarget && <div className="todo-nest-overlay" aria-hidden />}
 
@@ -291,13 +291,7 @@ export function TodoItem({
               />
             </div>
 
-            <div
-              className={`min-w-0 flex-1 ${
-                childProgress
-                  ? "pr-3 [@media(hover:hover)]:group-hover:pr-[7rem] [@media(hover:hover)]:group-focus-within:pr-[7rem]"
-                  : "[@media(hover:hover)]:group-hover:pr-[5.5rem] [@media(hover:hover)]:group-focus-within:pr-[5.5rem]"
-              }`}
-            >
+            <div className="min-w-0 flex-1">
               {editingTitle || editingNotes ? (
                 <>
                   {editingTitle ? (
@@ -310,29 +304,16 @@ export function TodoItem({
                       className="w-full rounded bg-zinc-800 px-2 py-1 text-base text-zinc-100 outline-none ring-1 ring-zinc-600"
                     />
                   ) : (
-                    <div className="flex min-w-0 items-baseline gap-1">
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        className={`min-w-0 flex-1 disabled:cursor-default ${
-                          node.completed ? "line-through text-zinc-500" : "text-zinc-100"
-                        } text-base`}
-                        {...titlePress}
-                      >
-                        <span className={textLayout}>{node.title}</span>
-                      </button>
-                      {childProgress && (
-                        <span
-                          className={`mr-1 shrink-0 text-[10px] tabular-nums ${
-                            childProgress.done === childProgress.total
-                              ? "text-zinc-400"
-                              : "text-zinc-500"
-                          }`}
-                        >
-                          {childProgress.done}/{childProgress.total}
-                        </span>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      className={`block w-full min-w-0 text-left disabled:cursor-default ${
+                        node.completed ? "line-through text-zinc-500" : "text-zinc-100"
+                      } text-base`}
+                      {...titlePress}
+                    >
+                      <span className={textLayout}>{node.title}</span>
+                    </button>
                   )}
 
                   {editingNotes ? (
@@ -364,29 +345,16 @@ export function TodoItem({
               ) : (
                 <div ref={previewOuterRef} className="todo-preview-expand">
                   <div ref={previewInnerRef}>
-                    <div className="flex min-w-0 items-baseline gap-1">
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        className={`min-w-0 flex-1 disabled:cursor-default ${
-                          node.completed ? "line-through text-zinc-500" : "text-zinc-100"
-                        } text-base`}
-                        {...titlePress}
-                      >
-                        <span className={textLayout}>{node.title}</span>
-                      </button>
-                      {childProgress && (
-                        <span
-                          className={`mr-1 shrink-0 text-[10px] tabular-nums ${
-                            childProgress.done === childProgress.total
-                              ? "text-zinc-400"
-                              : "text-zinc-500"
-                          }`}
-                        >
-                          {childProgress.done}/{childProgress.total}
-                        </span>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      className={`block w-full min-w-0 text-left disabled:cursor-default ${
+                        node.completed ? "line-through text-zinc-500" : "text-zinc-100"
+                      } text-base`}
+                      {...titlePress}
+                    >
+                      <span className={textLayout}>{node.title}</span>
+                    </button>
 
                     <button
                       type="button"
@@ -405,49 +373,14 @@ export function TodoItem({
               )}
             </div>
 
-            <div className={`todo-item-actions flex shrink-0 items-center ${isPending ? "opacity-40" : ""}`}>
-              <div
-                className={`todo-item-controls rounded-md bg-zinc-950/95 px-0.5 ${childProgress ? "[@media(hover:none)]:mr-0.5" : ""} ${isPending ? "pointer-events-none" : ""}`}
-              >
-                <div className="flex flex-col">
-                  <button
-                    type="button"
-                    onClick={onMoveUp}
-                    disabled={!canMoveUp}
-                    className="flex h-3.5 w-5 items-center justify-center rounded text-[10px] leading-none text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 disabled:invisible"
-                    aria-label="Move up"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onMoveDown}
-                    disabled={!canMoveDown}
-                    className="flex h-3.5 w-5 items-center justify-center rounded text-[10px] leading-none text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 disabled:invisible"
-                    aria-label="Move down"
-                  >
-                    ↓
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setAddingChild(true)}
-                  className="flex h-6 w-6 items-center justify-center rounded text-sm text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
-                  aria-label="Add sub-task"
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete(node._id, hasChildren(node))}
-                  className="flex h-6 w-6 items-center justify-center rounded text-sm text-zinc-400 hover:bg-red-950 hover:text-red-400"
-                  aria-label="Delete"
-                >
-                  ×
-                </button>
-              </div>
-
+            <div className={`todo-item-actions self-start pt-1 ${isPending ? "opacity-40" : ""}`}>
+              {progressBadge}
+              <TodoActionsMenu
+                disabled={isPending}
+                scrollContainerRef={scrollContainerRef}
+                onAddSubtask={() => setAddingChild(true)}
+                onDelete={() => onDelete(node._id, hasChildren(node))}
+              />
               <button
                 type="button"
                 ref={setActivatorNodeRef}
@@ -514,7 +447,6 @@ export function TodoItem({
               onUpdate={onUpdate}
               onCreate={onCreate}
               onDelete={onDelete}
-              onMoveSibling={onMoveSibling}
               isCollapsed={isCollapsed}
               toggleCollapsed={toggleCollapsed}
             />
