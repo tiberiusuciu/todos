@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/tiberiusuciu/todos/compare/v1.3.1...v1.4.0) (2026-05-30)
+
+
+### Features
+
+* **sockets:** Add usage of websockets to keep app instances in sync ([0459b2a](https://github.com/tiberiusuciu/todos/commit/0459b2a7c934da5674b81e63e70862b7004cf69b))
+
 ## [1.3.1](https://github.com/tiberiusuciu/todos/compare/v1.3.0...v1.3.1) (2026-05-28)
 
 
