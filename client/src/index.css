@@ -52,15 +52,12 @@ body {
   }
 
   .todo-item-actions {
-    @apply shrink-0;
-  }
-
-  .todo-item-controls {
-    @apply flex shrink-0 items-center gap-0.5 opacity-100;
+    @apply flex shrink-0 items-center gap-1;
   }
 
   .version-stamp {
-    @apply pointer-events-none fixed right-3 top-1/2 z-50 -translate-y-1/2 select-none font-mono text-[10px] tracking-[0.25em] text-zinc-600;
+    @apply pointer-events-none fixed top-1/2 z-[100] -translate-y-1/2 select-none font-mono text-[10px] font-medium tracking-normal text-zinc-500;
+    right: max(0.25rem, env(safe-area-inset-right, 0px));
     writing-mode: vertical-rl;
     text-orientation: mixed;
     text-shadow:
@@ -68,16 +65,12 @@ body {
       0 0 14px rgba(232, 121, 249, 0.08);
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .todo-item-controls {
-      @apply pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 opacity-0 transition-opacity;
-    }
+  .todo-actions-menu-trigger {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300;
+  }
 
-    .todo-item:hover .todo-item-controls,
-    .todo-item:focus-within .todo-item-controls,
-    .todo-item.show-controls .todo-item-controls {
-      @apply pointer-events-auto opacity-100;
-    }
+  .todo-actions-menu-trigger:disabled {
+    @apply cursor-not-allowed opacity-40;
   }
 
   .todo-drag-placeholder-inner {

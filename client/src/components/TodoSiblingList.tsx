@@ -19,7 +19,6 @@ type Props = {
   onUpdate: (id: string, data: { title?: string; notes?: string; emoji?: string; completed?: boolean }) => Promise<void>;
   onCreate: (parentId: string, title: string) => Promise<boolean>;
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
-  onMoveSibling: (siblings: TodoNode[], id: string, direction: "up" | "down") => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
 };
@@ -38,7 +37,6 @@ export function TodoSiblingList({
   activeId,
   dropPreview,
   dragRowHeight,
-  onMoveSibling,
   ...rest
 }: Props) {
   const sorted = sortSiblings(siblings);
@@ -59,14 +57,10 @@ export function TodoSiblingList({
           listParentId={listParentId}
           depth={depth}
           siblings={sorted}
-          siblingIndex={index}
           activeId={activeId}
           dropPreview={dropPreview}
           dragRowHeight={dragRowHeight}
           showInsertGhost={insertIndex === index && node._id !== activeId}
-          onMoveUp={() => onMoveSibling(sorted, node._id, "up")}
-          onMoveDown={() => onMoveSibling(sorted, node._id, "down")}
-          onMoveSibling={onMoveSibling}
           {...rest}
         />
       ))}

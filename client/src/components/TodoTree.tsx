@@ -15,7 +15,6 @@ type Props = {
   onUpdate: (id: string, data: { title?: string; notes?: string; emoji?: string; completed?: boolean }) => Promise<void>;
   onCreate: (parentId: string, title: string) => Promise<boolean>;
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
-  onMoveSibling: (siblings: TodoNode[], id: string, direction: "up" | "down") => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
 };
@@ -32,7 +31,6 @@ export function TodoTree({
   onUpdate,
   onCreate,
   onDelete,
-  onMoveSibling,
   isCollapsed,
   toggleCollapsed,
 }: Props) {
@@ -58,7 +56,6 @@ export function TodoTree({
       onUpdate={onUpdate}
       onCreate={onCreate}
       onDelete={onDelete}
-      onMoveSibling={onMoveSibling}
       isCollapsed={isCollapsed}
       toggleCollapsed={toggleCollapsed}
     />
