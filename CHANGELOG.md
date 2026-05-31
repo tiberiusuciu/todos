@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/tiberiusuciu/todos/compare/v1.5.0...v1.5.1) (2026-05-31)
+
+
+### Bug Fixes
+
+* **due-dates:** Add further due date vocabulary and add semver check on wake ([fb478ba](https://github.com/tiberiusuciu/todos/commit/fb478bac7de4d43b638d1852f18575db06db2013))
+
 # [1.5.0](https://github.com/tiberiusuciu/todos/compare/v1.4.1...v1.5.0) (2026-05-30)
 
 
