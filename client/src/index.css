@@ -15,6 +15,12 @@ body {
 }
 
 @layer components {
+  .todo-header-input {
+    transition:
+      box-shadow 200ms ease-out,
+      --tw-ring-color 200ms ease-out;
+  }
+
   .todo-scroll {
     scrollbar-width: thin;
     scrollbar-color: theme("colors.zinc.700") transparent;
