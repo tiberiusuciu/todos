@@ -1,10 +1,12 @@
-const EMOJI_REGEX = /\p{Extended_Pictographic}/u;
+import emojiRegex from 'emoji-regex';
+
+const EMOJI_REGEX = emojiRegex();
 
 export const FALLBACK_EMOJI = "📋";
 
 export function extractEmoji(text: string): string | null {
   const trimmed = text.trim();
-  const match = trimmed.match(EMOJI_REGEX);
+  const match = trimmed.match(EMOJI_REGEX)
   return match ? match[0] : null;
 }
 
