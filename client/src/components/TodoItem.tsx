@@ -46,6 +46,7 @@ type Props = {
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
+  forceExpandIds?: Set<string>;
 };
 
 function DragHandleIcon() {
@@ -88,6 +89,7 @@ export function TodoItem({
   onDelete,
   isCollapsed,
   toggleCollapsed,
+  forceExpandIds,
 }: Props) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
@@ -114,7 +116,7 @@ export function TodoItem({
 
   const childCount = node.children.length;
   const collapsed = isCollapsed(node._id);
-  const childrenOpen = childCount > 0 && !collapsed;
+  const childrenOpen = childCount > 0 && (!collapsed || forceExpandIds?.has(node._id));
   const isCreating = !!node.emojiPending || node._id.startsWith("temp-");
   const childProgress = childProgressMap.get(node._id);
   const isBeingDragged = isDragging || activeId === node._id;
@@ -492,6 +494,7 @@ export function TodoItem({
               onDelete={onDelete}
               isCollapsed={isCollapsed}
               toggleCollapsed={toggleCollapsed}
+              forceExpandIds={forceExpandIds}
             />
           </div>
         </div>

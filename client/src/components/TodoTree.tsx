@@ -17,6 +17,8 @@ type Props = {
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
+  forceExpandIds?: Set<string>;
+  emptyMessage?: string;
 };
 
 export function TodoTree({
@@ -33,10 +35,12 @@ export function TodoTree({
   onDelete,
   isCollapsed,
   toggleCollapsed,
+  forceExpandIds,
+  emptyMessage = "No tasks yet. Add one above.",
 }: Props) {
   if (nodes.length === 0) {
     return (
-      <p className="py-8 text-center text-zinc-500 text-base">No tasks yet. Add one above.</p>
+      <p className="py-8 text-center text-zinc-500 text-base">{emptyMessage}</p>
     );
   }
 
@@ -58,6 +62,7 @@ export function TodoTree({
       onDelete={onDelete}
       isCollapsed={isCollapsed}
       toggleCollapsed={toggleCollapsed}
+      forceExpandIds={forceExpandIds}
     />
   );
 }

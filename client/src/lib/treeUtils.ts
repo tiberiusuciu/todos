@@ -45,6 +45,41 @@ export function hasChildren(node: TodoNode): boolean {
   return node.children.length > 0;
 }
 
+function matchesSearchQuery(node: TodoNode, normalizedQuery: string): boolean {
+  return (
+    node.title.toLowerCase().includes(normalizedQuery) ||
+    node.notes.toLowerCase().includes(normalizedQuery)
+  );
+}
+
+export function filterBySearch(nodes: TodoNode[], query: string): TodoNode[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return nodes;
+
+  const result: TodoNode[] = [];
+  for (const node of nodes) {
+    const children = filterBySearch(node.children, query);
+    if (matchesSearchQuery(node, normalizedQuery) || children.length > 0) {
+      result.push({ ...node, children });
+    }
+  }
+  return result;
+}
+
+export function collectExpandIdsForSearch(nodes: TodoNode[]): Set<string> {
+  const ids = new Set<string>();
+  function walk(list: TodoNode[]) {
+    for (const node of list) {
+      if (node.children.length > 0) {
+        ids.add(node._id);
+        walk(node.children);
+      }
+    }
+  }
+  walk(nodes);
+  return ids;
+}
+
 export function filterCompleted(nodes: TodoNode[]): TodoNode[] {
   const result: TodoNode[] = [];
 
