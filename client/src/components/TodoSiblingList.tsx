@@ -21,7 +21,7 @@ type Props = {
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
-  forceExpandIds?: Set<string>;
+  searchHighlightQuery?: string;
 };
 
 function sortSiblings(siblings: TodoNode[]) {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { AuthPage } from "./components/AuthPage";
 import { Toast } from "./components/Toast";
 import { TodoTree } from "./components/TodoTree";
@@ -43,7 +43,7 @@ export default function App() {
     onSync: syncRemote,
     onRemoteChange: () => showToast("Updated from another device"),
   });
-  const { isCollapsed, toggle } = useCollapsedState();
+  const { isCollapsed, toggle, expand } = useCollapsedState();
   const { showCompleted, toggle: toggleShowCompleted } = useShowCompleted();
 
   const findNode = useCallback((nodes: TodoNode[], id: string): TodoNode | undefined => {
@@ -80,10 +80,10 @@ export default function App() {
     return filterBySearch(base, isSearchMode ? searchQuery : "");
   }, [tree, showCompleted, isSearchMode, searchQuery]);
 
-  const searchExpandIds = useMemo(() => {
-    if (!isSearchMode || !searchQuery.trim()) return undefined;
-    return collectExpandIdsForSearch(visibleTree);
-  }, [isSearchMode, searchQuery, visibleTree]);
+  const searchHighlightQuery = useMemo(
+    () => (isSearchMode ? searchQuery.trim() : ""),
+    [isSearchMode, searchQuery]
+  );
 
   const treeEmptyMessage = useMemo(() => {
     if (isSearchMode && searchQuery.trim()) {
@@ -93,6 +93,15 @@ export default function App() {
   }, [isSearchMode, searchQuery]);
   const completedCount = useMemo(() => countCompleted(tree), [tree]);
   const childProgressMap = useMemo(() => buildDirectChildProgressMap(tree), [tree]);
+
+  useEffect(() => {
+    if (!isSearchMode || !searchQuery.trim()) return;
+    const base = showCompleted ? tree : filterCompleted(tree);
+    const filtered = filterBySearch(base, searchQuery);
+    for (const id of collectExpandIdsForSearch(filtered)) {
+      if (isCollapsed(id)) expand(id);
+    }
+  }, [searchQuery, isSearchMode]);
 
   const handleAddRoot = (e: FormEvent) => {
     e.preventDefault();
@@ -242,7 +251,7 @@ export default function App() {
               onDelete={handleDelete}
               isCollapsed={isCollapsed}
               toggleCollapsed={toggle}
-              forceExpandIds={searchExpandIds}
+              searchHighlightQuery={searchHighlightQuery}
               emptyMessage={treeEmptyMessage}
             />
           </TodoDragProvider>

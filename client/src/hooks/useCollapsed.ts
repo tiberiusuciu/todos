@@ -31,5 +31,15 @@ export function useCollapsedState() {
     });
   };
 
-  return { isCollapsed, toggle };
+  const expand = (id: string) => {
+    setCollapsed((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      saveCollapsed(next);
+      return next;
+    });
+  };
+
+  return { isCollapsed, toggle, expand };
 }

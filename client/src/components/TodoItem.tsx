@@ -10,7 +10,8 @@ import {
 } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import type { DirectChildProgress, TodoNode } from "../lib/treeUtils";
-import { hasChildren } from "../lib/treeUtils";
+import { hasChildren, nodeSearchMatches } from "../lib/treeUtils";
+import { SearchHighlightedText } from "./SearchHighlightedText";
 import type { DropPreview } from "../lib/moveUtils";
 import { useLongPress } from "../hooks/useLongPress";
 import { useExpandHeight } from "../hooks/useExpandHeight";
@@ -46,7 +47,7 @@ type Props = {
   onDelete: (id: string, hasChildren: boolean) => Promise<void>;
   isCollapsed: (id: string) => boolean;
   toggleCollapsed: (id: string) => void;
-  forceExpandIds?: Set<string>;
+  searchHighlightQuery?: string;
 };
 
 function DragHandleIcon() {
@@ -89,7 +90,7 @@ export function TodoItem({
   onDelete,
   isCollapsed,
   toggleCollapsed,
-  forceExpandIds,
+  searchHighlightQuery = "",
 }: Props) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
@@ -116,7 +117,8 @@ export function TodoItem({
 
   const childCount = node.children.length;
   const collapsed = isCollapsed(node._id);
-  const childrenOpen = childCount > 0 && (!collapsed || forceExpandIds?.has(node._id));
+  const childrenOpen = childCount > 0 && !collapsed;
+  const searchMatches = nodeSearchMatches(node, searchHighlightQuery);
   const isCreating = !!node.emojiPending || node._id.startsWith("temp-");
   const childProgress = childProgressMap.get(node._id);
   const isBeingDragged = isDragging || activeId === node._id;
@@ -328,7 +330,12 @@ export function TodoItem({
                       aria-expanded={previewExpanded}
                       {...titlePress}
                     >
-                      <span className={textLayout}>{node.title}</span>
+                      <SearchHighlightedText
+                        text={node.title}
+                        query={searchHighlightQuery}
+                        active={searchMatches.title}
+                        className={textLayout}
+                      />
                     </button>
                   )}
 
@@ -351,7 +358,12 @@ export function TodoItem({
                       {...(node.notes ? notesPress : { onClick: startEditNotes })}
                     >
                       {node.notes ? (
-                        <span className={textLayout}>{node.notes}</span>
+                        <SearchHighlightedText
+                          text={node.notes}
+                          query={searchHighlightQuery}
+                          active={searchMatches.notes}
+                          className={textLayout}
+                        />
                       ) : (
                         "Add notes..."
                       )}
@@ -369,7 +381,12 @@ export function TodoItem({
                       aria-expanded={previewExpanded}
                       {...titlePress}
                     >
-                      <span className={textLayout}>{node.title}</span>
+                      <SearchHighlightedText
+                        text={node.title}
+                        query={searchHighlightQuery}
+                        active={searchMatches.title}
+                        className={textLayout}
+                      />
                     </button>
 
                     <button
@@ -379,7 +396,12 @@ export function TodoItem({
                       {...(node.notes ? notesPress : { onClick: startEditNotes })}
                     >
                       {node.notes ? (
-                        <span className={textLayout}>{node.notes}</span>
+                        <SearchHighlightedText
+                          text={node.notes}
+                          query={searchHighlightQuery}
+                          active={searchMatches.notes}
+                          className={textLayout}
+                        />
                       ) : (
                         "Add notes..."
                       )}
@@ -494,7 +516,7 @@ export function TodoItem({
               onDelete={onDelete}
               isCollapsed={isCollapsed}
               toggleCollapsed={toggleCollapsed}
-              forceExpandIds={forceExpandIds}
+              searchHighlightQuery={searchHighlightQuery}
             />
           </div>
         </div>
