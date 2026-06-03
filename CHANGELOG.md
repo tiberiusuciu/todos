@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/tiberiusuciu/todos/compare/v1.5.2...v1.6.0) (2026-06-03)
+
+
+### Features
+
+* **tasks:** Add search ([43c6d84](https://github.com/tiberiusuciu/todos/commit/43c6d849ea825254be3724c3bbaf7fdb1822d9f2))
+
 ## [1.5.2](https://github.com/tiberiusuciu/todos/compare/v1.5.1...v1.5.2) (2026-06-03)
 
 
