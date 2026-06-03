@@ -45,11 +45,27 @@ export function hasChildren(node: TodoNode): boolean {
   return node.children.length > 0;
 }
 
+export function normalizeSearchQuery(query: string): string {
+  return query.trim().toLowerCase();
+}
+
 function matchesSearchQuery(node: TodoNode, normalizedQuery: string): boolean {
   return (
     node.title.toLowerCase().includes(normalizedQuery) ||
     node.notes.toLowerCase().includes(normalizedQuery)
   );
+}
+
+export function nodeSearchMatches(
+  node: TodoNode,
+  query: string
+): { title: boolean; notes: boolean } {
+  const normalizedQuery = normalizeSearchQuery(query);
+  if (!normalizedQuery) return { title: false, notes: false };
+  return {
+    title: node.title.toLowerCase().includes(normalizedQuery),
+    notes: node.notes.toLowerCase().includes(normalizedQuery),
+  };
 }
 
 export function filterBySearch(nodes: TodoNode[], query: string): TodoNode[] {
@@ -58,8 +74,11 @@ export function filterBySearch(nodes: TodoNode[], query: string): TodoNode[] {
 
   const result: TodoNode[] = [];
   for (const node of nodes) {
-    const children = filterBySearch(node.children, query);
-    if (matchesSearchQuery(node, normalizedQuery) || children.length > 0) {
+    const selfMatches = matchesSearchQuery(node, normalizedQuery);
+    const children = selfMatches
+      ? node.children
+      : filterBySearch(node.children, query);
+    if (selfMatches || children.length > 0) {
       result.push({ ...node, children });
     }
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { TodoNode } from "./api";
-import { collectExpandIdsForSearch, filterBySearch } from "./treeUtils";
+import { collectExpandIdsForSearch, filterBySearch, nodeSearchMatches } from "./treeUtils";
 
 function node(
   partial: Partial<TodoNode> & Pick<TodoNode, "_id" | "title">,
@@ -40,6 +40,14 @@ describe("filterBySearch", () => {
     expect(result[0]._id).toBe("a");
   });
 
+  it("keeps all children when parent matches", () => {
+    const result = filterBySearch(tree, "work");
+    expect(result).toHaveLength(1);
+    expect(result[0]._id).toBe("b");
+    expect(result[0].children).toHaveLength(2);
+    expect(result[0].children.map((c) => c._id)).toEqual(["b1", "b2"]);
+  });
+
   it("keeps parent when nested child matches", () => {
     const result = filterBySearch(tree, "deploy");
     expect(result).toHaveLength(1);
@@ -57,6 +65,27 @@ describe("filterBySearch", () => {
 
   it("prunes non-matching branches", () => {
     expect(filterBySearch(tree, "zzz")).toEqual([]);
+  });
+});
+
+describe("nodeSearchMatches", () => {
+  const n = node({ _id: "a", title: "Buy groceries", notes: "urgent fix" });
+
+  it("returns no matches for empty query", () => {
+    expect(nodeSearchMatches(n, "")).toEqual({ title: false, notes: false });
+  });
+
+  it("matches title only", () => {
+    expect(nodeSearchMatches(n, "groceries")).toEqual({ title: true, notes: false });
+  });
+
+  it("matches notes only", () => {
+    expect(nodeSearchMatches(n, "urgent")).toEqual({ title: false, notes: true });
+  });
+
+  it("matches both fields independently", () => {
+    expect(nodeSearchMatches(n, "buy")).toEqual({ title: true, notes: false });
+    expect(nodeSearchMatches(n, "fix")).toEqual({ title: false, notes: true });
   });
 });
 
