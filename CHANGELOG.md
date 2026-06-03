@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/tiberiusuciu/todos/compare/v1.6.0...v1.6.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **search:** Update search logic ([f0ff60f](https://github.com/tiberiusuciu/todos/commit/f0ff60f42523c6c8566411cd28e8a61b5bb75857))
+
 # [1.6.0](https://github.com/tiberiusuciu/todos/compare/v1.5.2...v1.6.0) (2026-06-03)
 
 
