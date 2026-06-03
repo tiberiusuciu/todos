@@ -1,3 +1,11 @@
+## [1.5.2](https://github.com/tiberiusuciu/todos/compare/v1.5.1...v1.5.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* **emoji:** Support all emojis ([373e7bf](https://github.com/tiberiusuciu/todos/commit/373e7bf6a466c2f17c0d0aa485876f64dffca066))
+* **lockfile:** Update lockfile ([69a3b73](https://github.com/tiberiusuciu/todos/commit/69a3b73eaf921dabad50d0c50dbe113c90a02b03))
+
 ## [1.5.1](https://github.com/tiberiusuciu/todos/compare/v1.5.0...v1.5.1) (2026-05-31)
 
 
