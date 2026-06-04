@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/tiberiusuciu/todos/compare/v1.6.1...v1.7.0) (2026-06-04)
+
+
+### Features
+
+* **toasts:** Add success toasts with undo option ([05df5c9](https://github.com/tiberiusuciu/todos/commit/05df5c9f346ef08eb1983523b37081d853e00c3e))
+
 ## [1.6.1](https://github.com/tiberiusuciu/todos/compare/v1.6.0...v1.6.1) (2026-06-03)
 
 
