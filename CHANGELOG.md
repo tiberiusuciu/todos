@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/tiberiusuciu/todos/compare/v1.7.0...v1.8.0) (2026-06-04)
+
+
+### Features
+
+* **tasks:** Add show/hide all tasks ([f0726b9](https://github.com/tiberiusuciu/todos/commit/f0726b97e8bb299e509f1db49fe7c303dd92e112))
+
 # [1.7.0](https://github.com/tiberiusuciu/todos/compare/v1.6.1...v1.7.0) (2026-06-04)
 
 
