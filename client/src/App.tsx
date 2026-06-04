@@ -15,6 +15,7 @@ import {
   filterCompleted,
   filterBySearch,
   collectExpandIdsForSearch,
+  collectParentIds,
   buildDirectChildProgressMap,
   type TodoNode,
 } from "./lib/treeUtils";
@@ -43,7 +44,8 @@ export default function App() {
     onSync: syncRemote,
     onRemoteChange: () => showToast("Updated from another device"),
   });
-  const { isCollapsed, toggle, expand } = useCollapsedState();
+  const { isCollapsed, hasAnyExpandedAmong, toggle, expand, collapseAll, expandAll } =
+    useCollapsedState();
   const { showCompleted, toggle: toggleShowCompleted } = useShowCompleted();
 
   const findNode = useCallback((nodes: TodoNode[], id: string): TodoNode | undefined => {
@@ -93,6 +95,16 @@ export default function App() {
   }, [isSearchMode, searchQuery]);
   const completedCount = useMemo(() => countCompleted(tree), [tree]);
   const childProgressMap = useMemo(() => buildDirectChildProgressMap(tree), [tree]);
+  const parentIds = useMemo(() => collectParentIds(visibleTree), [visibleTree]);
+  const anyParentExpanded = useMemo(
+    () => hasAnyExpandedAmong(parentIds),
+    [parentIds, hasAnyExpandedAmong]
+  );
+
+  const handleToggleExpandAll = () => {
+    if (anyParentExpanded) collapseAll(parentIds);
+    else expandAll(parentIds);
+  };
 
   useEffect(() => {
     if (!isSearchMode || !searchQuery.trim()) return;
@@ -180,6 +192,15 @@ export default function App() {
               className="text-sm text-zinc-500 hover:text-zinc-300"
             >
               {showCompleted ? "Hide done" : `Show done (${completedCount})`}
+            </button>
+          )}
+          {!loading && parentIds.length > 0 && (
+            <button
+              type="button"
+              onClick={handleToggleExpandAll}
+              className="text-sm text-zinc-500 hover:text-zinc-300"
+            >
+              {anyParentExpanded ? "Collapse all" : "Expand all"}
             </button>
           )}
           <button

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { TodoNode } from "./api";
-import { collectExpandIdsForSearch, filterBySearch, nodeSearchMatches } from "./treeUtils";
+import {
+  collectExpandIdsForSearch,
+  collectParentIds,
+  filterBySearch,
+  nodeSearchMatches,
+} from "./treeUtils";
 
 function node(
   partial: Partial<TodoNode> & Pick<TodoNode, "_id" | "title">,
@@ -86,6 +91,24 @@ describe("nodeSearchMatches", () => {
   it("matches both fields independently", () => {
     expect(nodeSearchMatches(n, "buy")).toEqual({ title: true, notes: false });
     expect(nodeSearchMatches(n, "fix")).toEqual({ title: false, notes: true });
+  });
+});
+
+describe("collectParentIds", () => {
+  it("collects ids of all nodes with children", () => {
+    const tree: TodoNode[] = [
+      node(
+        { _id: "a", title: "Root" },
+        [
+          node({ _id: "a1", title: "Child" }),
+          node(
+            { _id: "a2", title: "Branch" },
+            [node({ _id: "a2a", title: "Leaf" })]
+          ),
+        ]
+      ),
+    ];
+    expect(collectParentIds(tree)).toEqual(["a", "a2"]);
   });
 });
 

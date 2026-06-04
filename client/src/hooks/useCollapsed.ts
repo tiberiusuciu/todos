@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const STORAGE_KEY = "todo-collapsed";
 
@@ -21,6 +21,11 @@ export function useCollapsedState() {
 
   const isCollapsed = (id: string) => collapsed.has(id);
 
+  const hasAnyExpandedAmong = useCallback(
+    (ids: string[]) => ids.some((id) => !collapsed.has(id)),
+    [collapsed]
+  );
+
   const toggle = (id: string) => {
     setCollapsed((prev) => {
       const next = new Set(prev);
@@ -41,5 +46,30 @@ export function useCollapsedState() {
     });
   };
 
-  return { isCollapsed, toggle, expand };
+  const collapseAll = (ids: Iterable<string>) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.add(id);
+      saveCollapsed(next);
+      return next;
+    });
+  };
+
+  const expandAll = (ids: Iterable<string>) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.delete(id);
+      saveCollapsed(next);
+      return next;
+    });
+  };
+
+  return {
+    isCollapsed,
+    hasAnyExpandedAmong,
+    toggle,
+    expand,
+    collapseAll,
+    expandAll,
+  };
 }
