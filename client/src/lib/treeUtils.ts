@@ -85,18 +85,22 @@ export function filterBySearch(nodes: TodoNode[], query: string): TodoNode[] {
   return result;
 }
 
-export function collectExpandIdsForSearch(nodes: TodoNode[]): Set<string> {
-  const ids = new Set<string>();
+export function collectParentIds(nodes: TodoNode[]): string[] {
+  const ids: string[] = [];
   function walk(list: TodoNode[]) {
     for (const node of list) {
       if (node.children.length > 0) {
-        ids.add(node._id);
+        ids.push(node._id);
         walk(node.children);
       }
     }
   }
   walk(nodes);
   return ids;
+}
+
+export function collectExpandIdsForSearch(nodes: TodoNode[]): Set<string> {
+  return new Set(collectParentIds(nodes));
 }
 
 export function filterCompleted(nodes: TodoNode[]): TodoNode[] {
