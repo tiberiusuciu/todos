@@ -23,7 +23,7 @@ export default function App() {
   const { user, loading: authLoading, logout } = useAuth();
   const listRef = useRef<HTMLDivElement>(null);
   const headerInputRef = useRef<HTMLInputElement>(null);
-  const { message, showToast, dismissToast } = useToast();
+  const { toasts, showToast, dismissToast } = useToast();
   const [newTitle, setNewTitle] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -131,7 +131,18 @@ export default function App() {
     id: string,
     data: { title?: string; notes?: string; emoji?: string; completed?: boolean; dueAt?: string | null }
   ) => {
+    const completing = data.completed === true;
+    const node = completing ? findNode(tree, id) : undefined;
     await update(id, data);
+    if (completing && node) {
+      const emoji = node.emoji || "📋";
+      const title = node.title.trim() || "Untitled";
+      const label = `${emoji} ${title}`;
+      const truncated = label.length > 40 ? `${label.slice(0, 39)}…` : label;
+      showToast(`Done: ${truncated}`, {
+        onUndo: () => void update(id, { completed: false }),
+      });
+    }
   };
 
   const handleCreateChild = (parentId: string, title: string) => {
@@ -258,7 +269,7 @@ export default function App() {
         )}
       </div>
 
-      <Toast message={message} onDismiss={dismissToast} />
+      <Toast toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }
